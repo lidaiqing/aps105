@@ -1,0 +1,207 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+
+void printBoard(char board[21][21],int n);
+int findLongest(char board[21][21],int n,int r,int c);
+int max(int l,int r)
+{
+    if(l<=r)return r;
+    else return l;
+}
+int main()
+{
+
+    char board[21][21];
+    int i,j;
+    for(i=0;i<=20;i++)
+        for(j=0;j<=20;j++)
+            board[i][j]='U';
+
+    printf("Enter board dimensions (n), n>=6 and n<=21: ");
+    int n;
+    scanf("%d",&n);
+    printBoard(board,n);
+    while(1)
+    {
+        int r,c;
+        printf("Enter position (ROW COL) of blocked square; (-1 -1) to finish ");
+        scanf("%d %d",&r,&c);
+        if(r==-1&&c==-1)break;
+        if(r>=n||c>=n||r<0||c<0)
+            printf("Out of range row or column\n");
+        else 
+        {
+            if(board[r][c]=='R')
+                printf("Position already occupied, try again\n");
+            else board[r][c]='R';
+        printBoard(board,n);
+        }
+    }
+    bool flip=true;
+    while(1)
+    {
+        int r,c;
+        if(flip)
+        {
+            printf("Enter Black Move (ROW COL); (-1 -1) to finish: ");
+        
+        }
+        else
+        {
+            printf("Enter While Move (ROW COL); (-1 -1) to finish: ");
+            
+        }
+
+
+        scanf("%d %d",&r,&c);
+        if(r==-1&&c==-1)break;
+        if(r>=n||c>=n||r<0||c<0)
+            printf("Out of range row or column\n");
+        else 
+        {
+            if(board[r][c]!='U')
+                printf("That square is already occupied or blocked\n");
+            else{
+                if(flip){
+                board[r][c]='B';
+                flip=false;
+                }
+                else {
+                    board[r][c]='W';
+                    flip=true;
+                }
+        printBoard(board,n);
+            }
+        }
+    }
+        
+    int state=0;
+    int longRun[21][21];
+    
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            if(board[i][j]!='U'&&board[i][j]!='R')
+            {
+                int longest=findLongest(board,n,i,j);
+                longRun[i][j]=longest;
+                if(longest>=6){
+                    if(board[i][j]=='W')state=1;
+                    if(board[i][j]=='B')state=2;
+                }
+            }
+        }
+    }
+
+    if(state==0)printf("No winner so far\n");
+    else if(state==1)printf("Black wins\n");
+    else printf("Withe wins\n");
+
+    while(1)
+    {
+        printf("Enter position (ROW COL) of square to measure; (-1 -1) to finish: ");
+        int r,c;
+        scanf("%d %d",&r,&c);
+        if(r==-1&&c==-1){
+            printf("Goodbye\n");
+                break;
+        }
+        if(r>=n||c>=n||r<0||c<0)
+            printf("Out of range row or column\n");
+        else 
+        {
+            if(board[r][c]=='U'||board[r][c]=='R')
+                printf("That square is neither white nor black\n");
+            else
+            {
+                printf("Longest Run of %c at position (%d,%d) is %d\n",board[r][c],r,c,longRun[r][c]);
+            }
+        }
+    }
+}
+void printBoard(char board[21][21],int n)
+{
+    int i,j;
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            printf("%c",board[i][j]);
+        }
+        printf("\n");
+    }
+}
+int findLongest(char board[21][21],int n,int r,int c)
+{
+    int l=0,rr=0,u=0,d=0,lu=0,ld=0,ru=0,rd=0;
+    int i,j;
+    for(i=c-1;i>=0;i--)
+    {
+        if(board[r][i]!=board[r][c])
+            break;
+        else l++;
+    }
+    for(i=c+1;i<n;i++)
+    {
+        if(board[r][i]!=board[r][c])
+            break;
+        else rr++;
+    }
+    for(i=r-1;i>=0;i--)
+    {
+        if(board[i][c]!=board[r][c])  
+            break;
+        else u++;
+    }
+    for(i=r+1;i<=n;i++)
+    {
+        if(board[i][c]!=board[r][c])
+            break;
+        else d++;
+    }
+    for(j=c-1,i=r-1;i>=0&&j>=0;i--,j--)
+    {
+        if(board[i][j]!=board[r][c])
+            break;
+        else lu++;
+    }
+    for(j=c+1,i=r+1;i<n&&j<n;i++,j++)
+    {
+        if(board[i][j]!=board[r][c])
+            break;
+        else rd++;
+    }
+    for( j=c+1,i=r-1;i<n&&j>=0;i--,j++)
+    {
+        if(board[i][j]!=board[r][c])
+            break;
+        else ru++;
+    }
+    for( j=c-1,i=r+1;i>=0&&j<n;i++,j--)
+    {
+        if(board[i][j]!=board[r][c])
+            break;
+        else ld++;
+    }
+   // printf("%d %d %d %d\n",l+rr+1,u+d+1,lu+rd+1,ld+ru+1);
+    return max(l+rr+1,max(u+d+1,max(lu+rd+1,ld+ru+1)));
+}
+
+
+
+
+                
+
+
+    
+
+
+
+        
+
+
+
+        
