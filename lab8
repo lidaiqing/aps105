@@ -1,1 +1,296 @@
-file:///home/lidaiqing/Documents/lab8/Lab8.c
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+
+void printBoard(char board[21][21],int n);
+int findLongest(char board[21][21],int n,int r,int c,char color);
+bool checkTie(char board[21][21],int n);
+int max(int l,int r)
+{
+    if(l<=r)return r;
+    else return l;
+}
+int main()
+{
+
+    char board[21][21];
+    int score[21][21];
+    int i,j;
+    for(i=0;i<=20;i++)
+    {  
+        for(j=0;j<=20;j++)
+        {   
+            board[i][j]='U';
+            score[i][j]=0;
+        }
+    }
+
+    printf("Enter board dimensions (n), n>=6 and n<=21: ");
+    int n;
+    scanf("%d",&n);
+    printBoard(board,n);
+    bool firstPlay;
+    char computerPlay,humanPlay;
+    printf("Computer playing B or W?: ");
+    scanf(" %c",&computerPlay);//printf("%c",computerPlay);
+    if(computerPlay=='B'){
+        humanPlay='W';
+        firstPlay=0;
+    }
+    else {
+        humanPlay='B';
+        firstPlay=1;
+    }
+
+    while(1)
+    {
+        int r,c;
+        printf("Enter position (ROW COL) of blocked square; (-1 -1) to finish ");
+        scanf("%d %d",&r,&c);
+        if(r==-1&&c==-1)break;
+        if(r>=n||c>=n||r<0||c<0)
+            printf("Out of range row or column\n");
+        else 
+        {
+            if(board[r][c]=='R')
+                printf("Position already occupied, try again\n");
+            else{
+                board[r][c]='R';
+               printBoard(board,n);
+            }
+        }
+    }
+    bool flip=firstPlay;
+    while(1)
+    {
+       // printf("asbas");
+        if(!checkTie(board,n)){
+            printf("\n");
+            printf("Draw!\n");
+            break;
+        }
+        int r,c;
+        if(firstPlay)
+        {
+            if(flip){
+            printf("Enter Black Move (ROW COL): ");
+            scanf("%d %d",&r,&c);
+             if(r==-1&&c==-1)break;
+                if(r>=n||c>=n||r<0||c<0)
+                 printf("Out of range row or column\n");
+             else 
+             {
+                      if(board[r][c]!='U')
+                         printf("That square is already occupied or blocked\n");
+                      else{
+        
+                          board[r][c]='B';
+                         flip=false;
+                           printBoard(board,n);
+                       }
+                }
+               if(findLongest(board,n,r,c,'B')>=6){
+                printf("\n");
+                printf("Black player wins.\n");
+                break;
+            }
+               board[r][c]='B';
+         }
+            else {
+                printf("Computer moves W at ");
+                int bestRow,bestCol,best=0;
+                for(i=0;i<n;i++)
+                {
+                    for(j=0;j<n;j++)
+                    {
+                        int scoreBlack,scoreWhite;
+                        
+                        if(board[i][j]=='U')
+                        {
+                            scoreBlack=findLongest(board,n,i,j,'B');
+                            scoreWhite=findLongest(board,n,i,j,'W');
+                            if(scoreBlack+scoreWhite>best)
+                            {
+                                best=scoreBlack+scoreWhite;
+                                bestRow=i;
+                                bestCol=j;
+                            }
+                        }
+                    }
+                }
+                board[bestRow][bestCol]='W';
+                printf("%d %d\n",bestRow,bestCol);
+                printBoard(board,n);
+                flip=true;
+                if(findLongest(board,n,bestRow,bestCol,'W')>=6){
+                printf("\n");
+                printf("White player wins.\n");
+                break;
+                 }
+                board[bestRow][bestCol]='W';
+
+            }
+        }
+        else {
+                if(flip){
+
+               printf("Enter White Move (ROW COL): ");
+            scanf("%d %d",&r,&c);
+             if(r==-1&&c==-1)break;
+                if(r>=n||c>=n||r<0||c<0)
+                 printf("Out of range row or column\n");
+             else 
+             {
+                      if(board[r][c]!='U')
+                         printf("That square is already occupied or blocked\n");
+                      else{
+        
+                          board[r][c]='W';
+                         flip=false;
+                           printBoard(board,n);
+                       }
+                }
+                  
+            if(findLongest(board,n,r,c,'W')>=6){
+                printf("\n");
+                printf("White player wins.\n");
+                break;
+            }
+            board[r][c]='W';
+         }
+            else {
+                printf("Computer moves B at ");
+                int bestRow,bestCol,best=0;
+                for(i=0;i<n;i++)
+                {
+                    for(j=0;j<n;j++)
+                    {
+                        int scoreBlack,scoreWhite;
+                        
+                        if(board[i][j]=='U')
+                        {   //printf("%d %d",i,j);
+                            scoreBlack=findLongest(board,n,i,j,'B');
+                            scoreWhite=findLongest(board,n,i,j,'W');
+                            if(scoreBlack+scoreWhite>best)
+                            {
+                                best=scoreBlack+scoreWhite;
+                                bestRow=i;
+                                bestCol=j;
+                                //printf("%d %d",i,j);
+                            }
+                        }
+                    }
+                }
+                board[bestRow][bestCol]='B';
+                printf("%d %d\n",bestRow,bestCol);
+                printBoard(board,n);
+                flip=true;
+                if(findLongest(board,n,bestRow,bestCol,'B')>=6){
+                printf("\n");
+                printf("Black player wins.\n");
+                break;
+                 }
+                board[bestRow][bestCol]='B';
+            }
+        }
+    }
+
+
+
+                                
+
+}
+void printBoard(char board[21][21],int n)
+{
+    int i,j;
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            printf("%c",board[i][j]);
+        }
+        printf("\n");
+    }
+}
+int findLongest(char board[21][21],int n,int r,int c,char color)
+{
+    int l=0,rr=0,u=0,d=0,lu=0,ld=0,ru=0,rd=0;
+    int i,j;
+    board[r][c]=color;
+    for(i=c-1;i>=0;i--)
+    {
+        if(board[r][i]!=board[r][c])
+            break;
+        else l++;
+    }
+    for(i=c+1;i<n;i++)
+    {
+        if(board[r][i]!=board[r][c])
+            break;
+        else rr++;
+    }
+    for(i=r-1;i>=0;i--)
+    {
+        if(board[i][c]!=board[r][c])  
+            break;
+        else u++;
+    }
+    for(i=r+1;i<n;i++)
+    {
+        if(board[i][c]!=board[r][c])
+            break;
+        else d++;
+    }
+    for(j=c-1,i=r-1;i>=0&&j>=0;i--,j--)
+    {
+        if(board[i][j]!=board[r][c])
+            break;
+        else lu++;
+    }
+    for(j=c+1,i=r+1;i<n&&j<n;i++,j++)
+    {
+        if(board[i][j]!=board[r][c])
+            break;
+        else rd++;
+    }
+    for( j=c+1,i=r-1;i<n&&j>=0;i--,j++)
+    {
+        if(board[i][j]!=board[r][c])
+            break;
+        else ru++;
+    }
+    for( j=c-1,i=r+1;i>=0&&j<n;i++,j--)
+    {
+        if(board[i][j]!=board[r][c])
+            break;
+        else ld++;
+    }
+   // printf("%d %d %d %d\n",l+rr+1,u+d+1,lu+rd+1,ld+ru+1);
+    board[r][c]='U';
+    return max(l+rr+1,max(u+d+1,max(lu+rd+1,ld+ru+1)));
+}
+bool checkTie(char board[21][21],int n)
+{
+    int i,j;
+    for(i=0;i<n;i++)
+        for(j=0;j<n;j++)
+            if(board[i][j]=='U')return true;
+
+    return false;
+}
+
+
+                
+
+
+    
+
+
+
+        
+
+
+
+        
